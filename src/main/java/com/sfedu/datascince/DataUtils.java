@@ -12,36 +12,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Main {
+public class DataUtils {
+    public static void singleFileProcess(String inPath, String outPath){
+        String filename = outPath + "/test_bench_out.xlsx";
+        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+        Sheet benchmark1 = workbook.createSheet("Sheet 1");
 
-
-
-    public static void main(String[] args) {
-        try {
-            String inPath = "/home/dann/Documents/bigData/";
-            String outPath = "/home/dann/Documents/bigData/output/";
-            benchmarkProcessor(2, inPath, outPath);
-        }catch (Exception ex){
-            System.out.println("Exception: " + ex);
-        }
+        double[][] bench = bench2arr(inPath);
     }
-    public static void benchmarkProcessor(int benchmark, String inPath, String outPath){
+
+    public static void benchmarkProcessor(String inPath, String outPath){
         try {
-            String filename = outPath + "bench_" + benchmark +"_out.xlsx" ;
+            String filename = outPath + "/bench_out.xlsx" ;
             SXSSFWorkbook workbook = new SXSSFWorkbook(100);
-            Sheet sheet = workbook.createSheet("Sheet");
-            for (int k = 1; k <= 73; k++) {
-                double[][] bench = bench2arr(inPath + "Benchmark_" + benchmark + "_sniff_" + k + ".txt");
-                List<Double>list = arrayToCorrelMatrix(bench);
-                System.out.println("result: Benchmark_" + benchmark + "_sniff_" + k);
+            Sheet benchmark1 = workbook.createSheet("Sheet 1");
+            Sheet benchmark2 = workbook.createSheet("Sheet 2");
+            for(int benchmark = 1; benchmark < 3; benchmark++){
+                Sheet sheet;
+                if (benchmark == 1){
+                    sheet = benchmark1;
+                } else {
+                    sheet = benchmark2;
+                }
+                for (int k = 1; k <= 73; k++) {
+                    double[][] bench = bench2arr(inPath + "/Benchmark_" + benchmark + "_sniff_" + k + ".txt");
+                    List<Double>list = arrayToCorrelMatrix(bench);
+                    System.out.println("result: Benchmark_" + benchmark + "_sniff_" + k);
 //                for(Double item : list){
 //                    System.out.print(String.format("%.2f",item) + "; ");
 //                }
-                Row row = sheet.createRow(k);
-                row.createCell(0).setCellValue("Benchmark " + benchmark + " sniff " + k);
-                for(int i = 0; i < list.size(); i++){
+                    Row row = sheet.createRow(k);
+                    row.createCell(0).setCellValue(benchmark);
+                    for(int i = 0; i < list.size(); i++){
 
-                    row.createCell(i+1).setCellValue(list.get(i));
+                        row.createCell(i+1).setCellValue(list.get(i));
+                    }
                 }
             }
             FileOutputStream fileOut = new FileOutputStream(filename);
@@ -54,7 +59,7 @@ public class Main {
         }
 
     }
-    public static  double[][] bench2arr(String inPath){
+    private static double[][] bench2arr(String inPath){
         try {
             double[][] foo = new double[8][2049];
             FileInputStream fstream = new FileInputStream(inPath);
@@ -79,7 +84,7 @@ public class Main {
             return null;
         }
     }
-    public static List<Double> arrayToCorrelMatrix(double[][] arr){
+    private static List<Double> arrayToCorrelMatrix(double[][] arr){
         List<Double> result = new ArrayList<>();
         for(int i = 0; i < arr[1].length-1; i++) {
             for (int j = 0; j < arr.length; j++) {
@@ -97,7 +102,7 @@ public class Main {
         return result;
     }
 
-    public static double correlCoef(double[][] arr, int x, int y){
+    private static double correlCoef(double[][] arr, int x, int y){
         double sumA = 0;
         double sumB = 0;
         double sumC = 0;
