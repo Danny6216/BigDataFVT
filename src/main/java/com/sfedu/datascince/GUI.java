@@ -4,11 +4,13 @@ import java.awt.*;
 import javax.swing.*;
 
 public class GUI extends JFrame {
+    private JRadioButton radio1 = new JRadioButton("Один файл");
+    private JRadioButton radio2 = new JRadioButton("Все файлов");
+
     private JButton inputDir = new JButton("Input Directory");
     private JButton outputDir = new JButton("Output Directory");
-    private JButton run = new JButton("Run");
-    private JButton singleBench = new JButton("Single benchmark process");
-    private JTextField input = new JTextField("", 5);
+    private JButton run = new JButton("Матрица Пирсона");
+
     private JFileChooser inDir = new JFileChooser();
     private JFileChooser outDir = new JFileChooser();
 
@@ -17,46 +19,62 @@ public class GUI extends JFrame {
     String outPath;
     public GUI() {
         super("Simple Example");
-        this.setBounds(100,100,400,500);
+        this.setBounds(100,100,400,200);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Container container = this.getContentPane();
-        container.setLayout(new GridLayout(3,2,2,2));
+        container.setLayout(new GridLayout(4,1,2,2));
+        run.setSize(20, 30);
+        ButtonGroup group = new ButtonGroup();
+        group.add(radio1);
+        group.add(radio2);
+        container.add(radio1);
+
+        radio1.setSelected(true);
+        container.add(radio2);
 
         inputDir.addActionListener(e -> {
-            inDir.setDialogTitle("Выбор директории");
-            // Определение режима - только каталог
-            inDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if(radio1.isSelected()){
+                inDir.setDialogTitle("Выбор файла");
+                inDir.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+            }else {
+                inDir.setDialogTitle("Выбор директории");
+                inDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            }
+
             int result = inDir.showOpenDialog(GUI.this);
-            // Если директория выбрана, покажем ее в сообщении
             if (result == JFileChooser.APPROVE_OPTION ){
                 JOptionPane.showMessageDialog(GUI.this, "Файл: "+ inDir.getSelectedFile());
                 inPath = inDir.getSelectedFile().getPath();
             }
-
         });
 
         outputDir.addActionListener(e -> {
-            outDir.setDialogTitle("Выбор директории");
-            // Определение режима - только каталог
-            outDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+                outDir.setDialogTitle("Выбор файла");
+                outDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
             int result = outDir.showOpenDialog(GUI.this);
-            // Если директория выбрана, покажем ее в сообщении
             if (result == JFileChooser.APPROVE_OPTION ){
                 JOptionPane.showMessageDialog(GUI.this, " Файл " + outDir.getSelectedFile());
                 outPath = outDir.getSelectedFile().getPath();
             }
         });
-        singleBench.addActionListener(e -> {
-            JFrame frame = new JFrame();
-            frame.setBounds(100,100,400,500);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+        run.addActionListener(e -> {
+            if(radio1.isSelected()){
+                DataUtils.singleFileProcess(inPath, outPath);
+            }else {
+                DataUtils.benchmarkProcessor(inPath, outPath);
+            }
         });
-
-        run.addActionListener(e -> DataUtils.benchmarkProcessor(inPath, outPath));
         container.add(inputDir);
         container.add(outputDir);
         container.add(run);
+//        container.add(singleInputDir);
+//        container.add(singleOutputDir);
+//        container.add(singleBench);
     }
 
 

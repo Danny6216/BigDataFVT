@@ -14,11 +14,27 @@ import java.util.List;
 
 public class DataUtils {
     public static void singleFileProcess(String inPath, String outPath){
-        String filename = outPath + "/test_bench_out.xlsx";
-        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
-        Sheet benchmark1 = workbook.createSheet("Sheet 1");
+        try {
+            String filename = outPath + "/test_bench_out.xlsx";
+            SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+            Sheet sheet = workbook.createSheet("Sheet 1");
 
-        double[][] bench = bench2arr(inPath);
+            double[][] bench = bench2arr(inPath);
+            Row row = sheet.createRow(1);
+            row.createCell(0).setCellValue(3);
+            List<Double>list = arrayToCorrelMatrix(bench);
+            for(int i = 0; i < list.size(); i++){
+
+                row.createCell(i+1).setCellValue(list.get(i));
+            }
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            workbook.write(fileOut);
+            fileOut.close();
+            workbook.dispose();
+            System.out.println("Your excel file has been generated!" + filename);
+        } catch (Exception ex){
+            System.out.println("Exception: " + ex);
+        }
     }
 
     public static void benchmarkProcessor(String inPath, String outPath){
